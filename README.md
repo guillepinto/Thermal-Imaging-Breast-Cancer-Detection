@@ -26,6 +26,6 @@ This project focuses on using thermal imaging as a non-invasive method for detec
 ### Installation
 Clone the repository and install the required libraries:
 ```sh
-git clone https://github.com/yourusername/Thermal-Imaging-Breast-Cancer-Detection.git
+git clone https://github.com/gpintoruiz/Thermal-Imaging-Breast-Cancer-Detection.git
 cd Thermal-Imaging-Breast-Cancer-Detection
 
