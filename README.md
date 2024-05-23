@@ -28,4 +28,9 @@ Clone the repository and install the required libraries:
 ```sh
 git clone https://github.com/gpintoruiz/Thermal-Imaging-Breast-Cancer-Detection.git
 cd Thermal-Imaging-Breast-Cancer-Detection
+pip install -r requirements.txt
+```
+---
+Original paper by Juan Pablo Zuluaga, Zeina Al Masry, Khaled Benaggoune, Safa Meraghni & Noureddine Zerhouni:
 
+[A CNN-based methodology for breast cancer diagnosis using thermal images](https://www.tandfonline.com/doi/full/10.1080/21681163.2020.1824685)
