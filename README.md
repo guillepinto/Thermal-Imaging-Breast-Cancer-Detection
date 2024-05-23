@@ -10,16 +10,16 @@ This project focuses on using thermal imaging as a non-invasive method for detec
 - Cristian Diaz
 - Cristian Hernandez
 
-## Project Structure
-<!-- `data/`: Contains the datasets used for the project. 
-- `scripts/`: Includes all the scripts for data preprocessing, feature extraction, and model training. -->
+<!-- ## Project Structure
+`data/`: Contains the datasets used for the project. 
+- `scripts/`: Includes all the scripts for data preprocessing, feature extraction, and model training. 
 - `notebooks/`: Jupyter notebooks with exploratory data analysis and experimental results.
 - `reports/`: Documentation and reports related to the project.
-- `presentation/`: Materials for the project presentation.
+- `presentation/`: Materials for the project presentation.-->
 
 ## Getting Started
 ### Prerequisites
-- Python 3.10.x
+- Python 3.9 or newer
 - Jupyter Notebook
 - Libraries: numpy, pandas, matplotlib.
 
