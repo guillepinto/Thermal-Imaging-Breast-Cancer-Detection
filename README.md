@@ -10,10 +10,10 @@ This project focuses on using thermal imaging as a non-invasive method for detec
 - Cristian Diaz
 - Cristian Hernandez
 
-<!-- ## Project Structure
-`data/`: Contains the datasets used for the project. 
-- `scripts/`: Includes all the scripts for data preprocessing, feature extraction, and model training. 
+## Project Structure
 - `notebooks/`: Jupyter notebooks with exploratory data analysis and experimental results.
+<!-- - `data/`: Contains the datasets used for the project. 
+- `scripts/`: Includes all the scripts for data preprocessing, feature extraction, and model training. 
 - `reports/`: Documentation and reports related to the project.
 - `presentation/`: Materials for the project presentation.-->
 
