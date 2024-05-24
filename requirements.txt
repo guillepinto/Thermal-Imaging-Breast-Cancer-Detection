@@ -1,4 +1,5 @@
 torch==2.2.1
 numpy==1.24.4
-cv2==4.9.0
+opencv-python==4.9.0
 torchvision==0.17.1
+python==3.10.12
