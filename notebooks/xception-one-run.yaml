@@ -1,0 +1,45 @@
+program: train_one_run.py
+method: bayes
+metric:
+  name: test_recall
+  goal: maximize
+parameters:
+  # in each run will test with a random fold
+  fold:
+    distribution: int_uniform
+    min: 1
+    max: 7
+  resize:
+    distribution: categorical
+    values:
+      - None 
+      - 300
+      - 150
+      - 50
+  augmented:
+    distribution: categorical
+    values:
+      - False
+      - True
+  normalize:
+    distribution: categorical
+    values:
+      - False
+      - True
+  optimizer:
+    distribution: categorical
+    values:
+      - adam
+      - sgd
+  batch_size:
+    distribution: int_uniform
+    min: 8
+    max: 64
+  architecture:
+    distribution: categorical
+    values:
+      - xception
+  learning_rate:
+    distribution: uniform
+    min: 0.0001
+    max: 0.01
