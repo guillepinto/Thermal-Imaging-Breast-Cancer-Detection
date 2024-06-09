@@ -24,7 +24,7 @@ def validate(model, test_loader, loss_fn, accuracy_fn, recall_fn, epoch):
 
     # Run the model on some test examples
     num_batches = len(test_loader)
-    val_loss, val_accuracy, val_recall = 0, 0, 0
+    val_loss, val_accuracy = 0, 0
 
     # Disable gradient calculation
     with torch.no_grad():
@@ -41,6 +41,6 @@ def validate(model, test_loader, loss_fn, accuracy_fn, recall_fn, epoch):
         val_recall /= num_batches
 
         # Log the evaluation metrics at the end of batches
-        wandb.log({"epoch": epoch+1, "val_loss": val_loss, "val_accuracy": val_accuracy, "val_recall": val_recall})
-        print(f"val loss: {val_loss:.3f} accuracy: {val_accuracy:.3f} recall: {val_recall:.3f} [after {num_batches} batches]")
-    return val_accuracy
+        wandb.log({"epoch": epoch+1, "val_loss": val_loss, "val_accuracy": val_accuracy})
+        print(f"val loss: {val_loss:.3f} accuracy: {val_accuracy:.3f} [after {num_batches} batches]")
+    return val_loss

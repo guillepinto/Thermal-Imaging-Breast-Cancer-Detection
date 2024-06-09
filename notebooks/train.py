@@ -77,8 +77,8 @@ def train(model, train_loader, val_loader, criterion, optimizer, accuracy_fn, re
 
     # Initialize the step counter 
     step = 0
-    best_val_accuracy = 0
-    patience = 10
+    best_val_loss = float('inf')
+    patience = 5
 
     n_prints = int(len(train_loader)/4)
 
@@ -101,12 +101,12 @@ def train(model, train_loader, val_loader, criterion, optimizer, accuracy_fn, re
               step += 1
             
       # and validate its performance per epoch
-      val_accuracy = validate(model, val_loader, criterion, accuracy_fn, recall_fn, epoch=t)
+      val_loss = validate(model, val_loader, criterion, accuracy_fn, recall_fn, epoch=t)
 
       # Early stopping    
-      if val_accuracy > best_val_accuracy:
-        best_val_accuracy = val_accuracy
-        patience = 10  # Reset patience counter
+      if val_loss < best_val_loss:
+        best_val_loss = val_loss
+        patience = 5  # Reset patience counter
       else:
         patience -= 1
         if patience == 0:
