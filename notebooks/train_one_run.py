@@ -50,7 +50,7 @@ def model_pipeline(hyperparameters):
 
         # and use them to train the model
         print(f"FOLD {config.fold}\n-------------------------------")
-        train(model, train_loader, val_loader, criterion, optimizer, accuracy_fn, recall_fn, epochs)
+        train(model, train_loader, val_loader, criterion, optimizer, accuracy_fn, epochs)
             
         # get metrics of the model    
         test(model, test_loader, accuracy_fn, f1_score_fn, recall_fn, precision_fn)

@@ -54,7 +54,7 @@ def train_batch(images, labels, model, optimizer, criterion, metrics_fn):
 
     return loss, accuracy
 
-def train(model, train_loader, val_loader, criterion, optimizer, accuracy_fn, recall_fn, epochs):
+def train(model, train_loader, val_loader, criterion, optimizer, accuracy_fn, epochs):
     """
     Train the given model using the specified data loader, criterion, optimizer, and metric function.
 
@@ -80,6 +80,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, accuracy_fn, re
     best_val_loss = float('inf')
     patience = 5
 
+    # 4 means that I am going to make 4 logs of the metrics when training
     n_prints = int(len(train_loader)/4)
 
     # Run training and track with wandb
@@ -101,7 +102,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, accuracy_fn, re
               step += 1
             
       # and validate its performance per epoch
-      val_loss = validate(model, val_loader, criterion, accuracy_fn, recall_fn, epoch=t)
+      val_loss = validate(model, val_loader, criterion, accuracy_fn, epoch=t)
 
       # Early stopping    
       if val_loss < best_val_loss:

@@ -6,7 +6,7 @@ import torch
 
 from utils import DEVICE
 
-def validate(model, test_loader, loss_fn, accuracy_fn, recall_fn, epoch):
+def validate(model, val_loader, loss_fn, accuracy_fn, epoch):
     """ 
     Evaluate the model on the test dataset and log the performance metrics.
 
@@ -18,27 +18,25 @@ def validate(model, test_loader, loss_fn, accuracy_fn, recall_fn, epoch):
     epoch (int): The current epoch number.
 
     Returns:
-    val_accuracy (float): The average accuracy over the test dataset.
+    val_loss (float): The average loss over the test dataset.
     """
     model.eval()
 
     # Run the model on some test examples
-    num_batches = len(test_loader)
+    num_batches = len(val_loader)
     val_loss, val_accuracy = 0, 0
 
     # Disable gradient calculation
     with torch.no_grad():
-        for images, labels in test_loader:
+        for images, labels in val_loader:
             images, labels = images.to(DEVICE), labels.to(DEVICE)
             outputs = model(images)
             val_loss += loss_fn(outputs, labels.unsqueeze(1).float()).item()
             val_accuracy += accuracy_fn(outputs, labels.unsqueeze(1).float())
-            val_recall += recall_fn(outputs, labels.unsqueeze(1).float())
  
         # Average the metrics over all batches
         val_loss /= num_batches
         val_accuracy /= num_batches
-        val_recall /= num_batches
 
         # Log the evaluation metrics at the end of batches
         wandb.log({"epoch": epoch+1, "val_loss": val_loss, "val_accuracy": val_accuracy})
