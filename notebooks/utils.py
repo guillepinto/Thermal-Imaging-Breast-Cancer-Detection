@@ -8,7 +8,7 @@ import torch.nn as nn
 # Make datasets
 from make_dataset import get_data, make_loader
 
-# Make Xception
+# Models
 from xception import xception
 
 # Pytorch metrics

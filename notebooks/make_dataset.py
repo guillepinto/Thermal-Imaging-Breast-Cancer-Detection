@@ -13,6 +13,7 @@ import torch
 
 # Utils
 import os
+from preprocess import crop_breast
 
 # PyTorch torchvision
 from torchvision.transforms import v2
@@ -155,11 +156,12 @@ calcular su valor máximo de temperatura y devolver el máximo de todas.
 MAX_TEMPERATURE = 36.44
 
 class ThermalDataset(Dataset):
-  def __init__(self, dataframe, transform = None, normalize = None, resize = None):
+  def __init__(self, dataframe, transform = None, normalize = None, resize = None, crop = None):
     self.dataframe = dataframe
     self.normalize = normalize
     self.transform = transform
     self.resize = resize
+    self.crop = crop
 
   def __len__(self):
     return len(self.dataframe)
@@ -189,6 +191,10 @@ class ThermalDataset(Dataset):
     # segmented = img * matrix
     img = (matrix * segmented).astype(np.float32) # float32, shape (480, 640)
 
+    if self.crop:
+      img = crop_breast(img) 
+      # print(img.shape, img.dtype) # float32, shape (112, 112)
+
     # Le agrego un canal explícito
     img = np.expand_dims(img, axis=2) # https://numpy.org/doc/stable/reference/generated/numpy.expand_dims.html
 
@@ -208,18 +214,18 @@ class ThermalDataset(Dataset):
     self.resize = None if self.resize == 'None' else self.resize
 
     if self.resize:
-      # Todas las imagenes vienen en h: 480, w: 640. El objetivo es disminuir el tamaño
-      # sin perder la relación de aspecto. https://gist.github.com/tomvon/ae288482869b495201a0
+      # Todas las imagenes vienen en h: 480, w: 640 (si no se le hizo crop). El objetivo
+      # es disminuir el tamaño sin perder la relación de aspecto. https://gist.github.com/tomvon/ae288482869b495201a0
       HEIGHT = self.resize
-      r = HEIGHT/480 # Calculo la relación de aspecto.
-      WIDTH = int(640*r)
+      r = HEIGHT/img.shape[1] # Calculo la relación de aspecto.
+      WIDTH = int(img.shape[2]*r)
       # print(f"Efectivamente, voy a hacer resize a {HEIGHT}x{WIDTH}")
       resize = v2.Resize(size=(HEIGHT, WIDTH), antialias=True)
       img = resize(img)
 
     return img, label
 
-def get_data(transform, resize=None, normalize=False, slice=1, fold:int=1):
+def get_data(transform, crop=None, resize=None, normalize=False, slice=1, fold:int=1):
 
     data = make_dataframe()
 
@@ -233,13 +239,13 @@ def get_data(transform, resize=None, normalize=False, slice=1, fold:int=1):
 
     train_dataset = ThermalDataset(subdataframes[fold_name]['train'],
                                     transform=transform, normalize=normalize,
-                                    resize=resize)
+                                    resize=resize, crop=crop)
     val_dataset = ThermalDataset(subdataframes[fold_name]['val'],
                                   transform=v2.ToImage(), normalize=normalize,
-                                  resize=resize)
+                                  resize=resize, crop=crop)
     test_dataset = ThermalDataset(subdataframes[fold_name]['test'],
                                     transform=v2.ToImage(), normalize=normalize,
-                                    resize=resize)
+                                    resize=resize, crop=crop)
     
     # test with less data, it helped me to set up the experiments faster if slice=1
     #  then it returns the complete dataset
@@ -261,30 +267,30 @@ def make_loader(dataset, batch_size):
 
 # Test
 
-# data = make_dataframe()
+data = make_dataframe()
 
-# # Generar los folds
-# folds = make_folds(data)
+# Generar los folds
+folds = make_folds(data)
 
-# # Crear subdataframes 
-# subdataframes = make_subdataframes(data, folds)
+# Crear subdataframes 
+subdataframes = make_subdataframes(data, folds)
 
-# train, val, test = get_data(transform=v2.ToImage(), resize=50, normalize=True, slice=10)
+train, val, test = get_data(transform=v2.ToImage(), resize=50, normalize=False, slice=10, crop=True)
 
-# print(train.__len__(), val.__len__(), test.__len__())
+print(train.__len__(), val.__len__(), test.__len__())
 
-# train_loader = make_loader(train, 4)
-# val_loader = make_loader(val, 4)
-# test_loader = make_loader(test, 4)
+train_loader = make_loader(train, 4)
+val_loader = make_loader(val, 4)
+test_loader = make_loader(test, 4)
 
-# for images, labels in train_loader:
-#     print(images.shape, labels)
-#     break
+for images, labels in train_loader:
+    print(images.shape, labels)
+    break
 
-# for images, labels in val_loader:
-#     print(images.shape, labels)
-#     break
+for images, labels in val_loader:
+    print(images.shape, labels)
+    break
 
-# for images, labels in test_loader:
-#     print(images.shape, labels)
-#     break
+for images, labels in test_loader:
+    print(images.shape, labels)
+    break
