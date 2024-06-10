@@ -17,7 +17,7 @@ from torchmetrics.classification import BinaryAccuracy, BinaryF1Score, BinaryRec
 # Device configuration
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-def make(config, fold=1):
+def make(config, fold=None):
     
     # Make transforms for data
     transform = make_transforms(augmentation=config.augmented)
@@ -25,7 +25,7 @@ def make(config, fold=1):
     # Make the data
     train, val, test = get_data(transform=transform, slice=1, 
                                 normalize=config.normalize, fold=fold, 
-                                resize=config.resize)
+                                resize=config.resize, crop=config.crop)
     train_loader = make_loader(train, batch_size=config.batch_size)
     val_loader = make_loader(val, batch_size=config.batch_size)
     test_loader = make_loader(test, batch_size=config.batch_size)
@@ -65,7 +65,6 @@ def make_transforms(augmentation=False):
   if augmentation:
       # print("Efectivamente, voy a hacer transformaciones")
       transforms_list.append(v2.RandomHorizontalFlip())
-      # transforms_list.append(v2.RandomCrop(size=(HEIGHT, WIDTH)))
       transforms_list.append(v2.RandomRotation(degrees=15)) # Aplica una rotación aleatoria de hasta 15 grados.
       transforms_list.append(v2.RandomApply([v2.GaussianBlur(kernel_size=5)], p=0.5)) # Aplica un desenfoque gaussiano con una probabilidad de 0.5.
       transforms_list.append(v2.RandomApply([v2.ColorJitter(brightness=0.2, contrast=0.2)], p=0.5)) # Ajusta el brillo y el contraste de la imagen con una probabilidad de 0.5.
@@ -90,3 +89,4 @@ def make_model(architecture:str):
   if architecture=='xception':
       model = xception(n_channels=1, n_classes=1)
   return model
+

@@ -1,42 +1,34 @@
+# the program to run
 program: train_one_run.py
+
+# method can be grid, random or bayes
 method: bayes
+
+# this sweep is part of 
+project: dip-project
+
+# metric to optimize
 metric:
   name: test_recall
   goal: maximize
+
+# parameters space to search
 parameters:
-  # in each run will test with a random fold
-  fold:
-    distribution: int_uniform
-    min: 1
-    max: 7
   resize:
-    distribution: categorical
-    values:
-      - None 
-      - 300
-      - 150
-      - 50
+    values: [False, 300, 150, 50]
   augmented:
-    distribution: categorical
-    values:
-      - False
-      - True
+    values: [True, False]
+  crop:
+    values: [True, False]
   normalize:
-    distribution: categorical
-    values:
-      - False
-      - True
+    values: [True, False]
   optimizer:
-    distribution: categorical
     values:
       - adam
       - sgd
   batch_size:
-    distribution: int_uniform
-    min: 8
-    max: 64
+    values: [8, 16, 32, 64]
   architecture:
-    distribution: categorical
     values:
       - xception
   learning_rate:

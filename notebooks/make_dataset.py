@@ -211,7 +211,7 @@ class ThermalDataset(Dataset):
       # print(type(img), img.shape)
       img = self.transform(img)
 
-    self.resize = None if self.resize == 'None' else self.resize
+    # self.resize = None if self.resize == 'None' else self.resize
 
     if self.resize:
       # Todas las imagenes vienen en h: 480, w: 640 (si no se le hizo crop). El objetivo
@@ -225,7 +225,7 @@ class ThermalDataset(Dataset):
 
     return img, label
 
-def get_data(transform, crop=None, resize=None, normalize=False, slice=1, fold:int=1):
+def get_data(transform, crop=None, resize=None, normalize=False, slice=1, fold:int=None):
 
     data = make_dataframe()
 
@@ -235,7 +235,11 @@ def get_data(transform, crop=None, resize=None, normalize=False, slice=1, fold:i
     # Create subdataframes  
     subdataframes = make_subdataframes(data, folds)
 
+    if not fold:
+      fold = np.random.choice(range(1, 8))
+
     fold_name = f'fold_{fold}'
+    print(f"FOLD {fold}\n-------------------------------")
 
     train_dataset = ThermalDataset(subdataframes[fold_name]['train'],
                                     transform=transform, normalize=normalize,
@@ -248,7 +252,7 @@ def get_data(transform, crop=None, resize=None, normalize=False, slice=1, fold:i
                                     resize=resize, crop=crop)
     
     # test with less data, it helped me to set up the experiments faster if slice=1
-    #  then it returns the complete dataset
+    # then it returns the complete dataset
     train_dataset = torch.utils.data.Subset(train_dataset, 
                                             indices=range(0, len(train_dataset), slice))
     val_dataset = torch.utils.data.Subset(val_dataset, 
@@ -267,30 +271,30 @@ def make_loader(dataset, batch_size):
 
 # Test
 
-data = make_dataframe()
+# data = make_dataframe()
 
-# Generar los folds
-folds = make_folds(data)
+# # Generar los folds
+# folds = make_folds(data)
 
-# Crear subdataframes 
-subdataframes = make_subdataframes(data, folds)
+# # Crear subdataframes 
+# subdataframes = make_subdataframes(data, folds)
 
-train, val, test = get_data(transform=v2.ToImage(), resize=50, normalize=False, slice=10, crop=True)
+# train, val, test = get_data(transform=v2.ToImage(), resize=300, normalize=False, slice=10, crop=True)
 
-print(train.__len__(), val.__len__(), test.__len__())
+# print(train.__len__(), val.__len__(), test.__len__())
 
-train_loader = make_loader(train, 4)
-val_loader = make_loader(val, 4)
-test_loader = make_loader(test, 4)
+# train_loader = make_loader(train, 4)
+# val_loader = make_loader(val, 4)
+# test_loader = make_loader(test, 4)
 
-for images, labels in train_loader:
-    print(images.shape, labels)
-    break
+# for images, labels in train_loader:
+#     print(images.shape, labels)
+#     break
 
-for images, labels in val_loader:
-    print(images.shape, labels)
-    break
+# for images, labels in val_loader:
+#     print(images.shape, labels)
+#     break
 
-for images, labels in test_loader:
-    print(images.shape, labels)
-    break
+# for images, labels in test_loader:
+#     print(images.shape, labels)
+#     break
