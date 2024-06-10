@@ -9,7 +9,7 @@ from test import test
 from train import train
 
 default_config = SimpleNamespace(
-    epochs=3,
+    epochs=30,
     classes=1,
     n_channels=1,
     batch_size=4,
