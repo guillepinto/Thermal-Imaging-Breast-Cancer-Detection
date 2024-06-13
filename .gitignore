@@ -2,8 +2,8 @@ Imagens e Matrizes da Tese de Thiago Alves Elias da Silva
 thermal-images-for-breast-cancer-diagnosis-dmrir.zip
 reports/zuluaga-gomez2020.pdf
 models/*
+notebooks/0.03-gpr-initial-experiment.ipynb
 notebooks/0.02-gpr-experiments-base.ipynb
-notebooks/0.03-gpr-experiments-base.ipynb
 reports/figures
 
 # wandb files
