@@ -1,12 +1,13 @@
-database.rar
 Imagens e Matrizes da Tese de Thiago Alves Elias da Silva
-notebooks/thermal-images-for-breast-cancer-diagnosis-dmrir.zip
+thermal-images-for-breast-cancer-diagnosis-dmrir.zip
 reports/zuluaga-gomez2020.pdf
 models/*
+notebooks/0.02-gpr-experiments-base.ipynb
+notebooks/0.03-gpr-experiments-base.ipynb
+reports/figures
 
 # wandb files
 wandb
-model.onnx
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
