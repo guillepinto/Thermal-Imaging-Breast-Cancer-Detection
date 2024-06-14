@@ -14,6 +14,9 @@ from xception import xception
 # Pytorch metrics
 from torchmetrics.classification import BinaryAccuracy, BinaryF1Score, BinaryRecall, BinaryPrecision
 
+# Create plots
+import matplotlib.pyplot as plt
+
 # Device configuration
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -90,3 +93,35 @@ def make_model(architecture:str):
       model = xception(n_channels=1, n_classes=1)
   return model
 
+def visualize_batch_inference(images, ground_truths, predictions):
+    batch_size = len(images)
+    cols = 4  # Número de columnas para la cuadrícula
+    rows = (batch_size + cols - 1) // cols  # Número de filas necesario
+
+    fig, axes = plt.subplots(rows, cols, figsize=(15, 15))
+
+    for i in range(batch_size):
+        row = i // cols
+        col = i % cols
+        ax = axes[row, col] if rows > 1 else axes[col]
+
+        # Mostrar la imagen en escala de grises con colormap 'inferno'
+        ax.imshow(images[i].squeeze(0), cmap='inferno')
+        
+        # Anotaciones para ground truth y predicción
+        gt_text = f"True: {'Benign' if ground_truths[i] else 'Malignant'}"
+        pred_text = f"Prediction: {'Benign' if predictions[i] else 'Malignant'}"
+        ax.set_title(f'{gt_text} | {pred_text}')
+        ax.axis('off')
+
+    # Desactivar los ejes sobrantes
+    for j in range(i + 1, rows * cols):
+        row = j // cols
+        col = j % cols
+        ax = axes[row, col] if rows > 1 else axes[col]
+        ax.axis('off')
+
+    plt.tight_layout()
+    # plt.show()
+
+    return fig

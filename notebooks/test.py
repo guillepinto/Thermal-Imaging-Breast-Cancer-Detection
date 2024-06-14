@@ -4,7 +4,8 @@ import wandb
 # Pytorch essentials
 import torch
 
-from utils import DEVICE
+# Utils
+from utils import DEVICE, visualize_batch_inference
 
 def test(model, test_loader, accuracy_fn, f1_score_fn, recall_fn, precision_fn):
     """ 
@@ -40,7 +41,11 @@ def test(model, test_loader, accuracy_fn, f1_score_fn, recall_fn, precision_fn):
         test_recall /= num_batches
         test_precision /= num_batches
 
+        # Make visual inference to last batch
+        fig = visualize_batch_inference(images.cpu(), ground_truths=labels.cpu(), predictions=outputs.cpu())
+
         # Log the evaluation metrics at the end of batches
+        wandb.log({"Inferences": [wandb.Image(fig, caption="Batch Inference")]})
         wandb.log({"test_accuracy": test_accuracy, "test_f1": test_f1,
                     "test_recall": test_recall, "test_precision": test_precision})
         print(f"test accuracy: {test_accuracy:.3f} recall: {test_recall:.3f} precision: {test_precision:.3f} f1: {test_f1:.3f} [after {num_batches} batches]")
