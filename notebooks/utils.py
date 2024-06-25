@@ -63,15 +63,13 @@ def make_transforms(augmentation=False):
     v2.ToImage(),
   ]
 
-  # if rezise:
-  #   transforms_list.append(v2.Resize(size=(HEIGHT, WIDTH), antialias=True))
-
   if augmentation:
       # print("Efectivamente, voy a hacer transformaciones")
       transforms_list.append(v2.RandomHorizontalFlip())
-      transforms_list.append(v2.RandomRotation(degrees=15)) # Aplica una rotación aleatoria de hasta 15 grados.
+      transforms_list.append(v2.RandomVerticalFlip())
+      transforms_list.append(v2.RandomRotation(degrees=45)) # Aplica una rotación aleatoria de hasta 15 grados.
+      # transforms_list.append(v2.RandomZoomOut())
       transforms_list.append(v2.RandomApply([v2.GaussianBlur(kernel_size=5)], p=0.5)) # Aplica un desenfoque gaussiano con una probabilidad de 0.5.
-      transforms_list.append(v2.RandomApply([v2.ColorJitter(brightness=0.2, contrast=0.2)], p=0.5)) # Ajusta el brillo y el contraste de la imagen con una probabilidad de 0.5.
       transforms_list.append(v2.RandomApply([v2.RandomAffine(degrees=0, translate=(0.05, 0.05))], p=0.5)) # Aplica pequeñas traslaciones (hasta el 5% del tamaño de la imagen).
 
   transform = v2.Compose(transforms_list)
