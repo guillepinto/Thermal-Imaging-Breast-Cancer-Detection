@@ -279,15 +279,15 @@ def make_loader(dataset, batch_size):
 
 # Test
 
-data = make_dataframe()
+# data = make_dataframe()
 
-# Generar los folds
-folds = make_folds(data)
+# # Generar los folds
+# folds = make_folds(data)
 
-# Crear subdataframes 
-subdataframes = make_subdataframes(data, folds)
+# # Crear subdataframes 
+# subdataframes = make_subdataframes(data, folds)
 
-print(subdataframes)
+# print(subdataframes)
 
 # train, val, test = get_data(transform=v2.ToImage(), resize=300, normalize=False, slice=10, crop=True)
 
