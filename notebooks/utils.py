@@ -10,6 +10,7 @@ from make_dataset import get_data, make_loader
 
 # Models
 from xception import xception
+from vgg import vgg
 
 # Pytorch metrics
 from torchmetrics.classification import BinaryAccuracy, BinaryF1Score, BinaryRecall, BinaryPrecision
@@ -91,6 +92,8 @@ def build_optimizer(network, optimizer, learning_rate):
 def make_model(architecture:str):
   if architecture=='xception':
       model = xception(n_channels=1, n_classes=1)
+  elif architecture=='vgg':
+      model = vgg(num_classes=1, input_size=[1, 480, 640])
   return model
 
 def visualize_batch_inference(images, ground_truths, predictions):
