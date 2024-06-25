@@ -119,13 +119,21 @@ def make_folds(data:pd.DataFrame):
     for i, (train_index, test_index) in enumerate(gkf.split(X, y, groups), 1):
         train_groups = groups[train_index]
 
-        gss = GroupShuffleSplit(n_splits=1, test_size=0.16, random_state=42)
-        train_idx, val_idx = next(gss.split(train_index, y[train_index], groups=train_groups))
-
+        # Seleccionar aleatoriamente (size) pacientes del conjunto de entrenamiento para validación
+        unique_train_groups = np.unique(train_groups)
+        random_val_patients = np.random.choice(unique_train_groups, size=8, replace=False)
+        
+        # Filtrar los índices de los pacientes seleccionados para validación
+        val_indices = np.isin(train_groups, random_val_patients)
+        
+        # Obtener los índices finales para entrenamiento y validación
+        final_train_index = train_index[~val_indices]
+        val_index = train_index[val_indices]
+        
         fold_name = f"fold_{i}"
         folds_dict[fold_name] = {
-            'train': train_index[train_idx],
-            'val': train_index[val_idx],
+            'train': final_train_index,
+            'val': val_index,
             'test': test_index
         }
 
@@ -271,13 +279,15 @@ def make_loader(dataset, batch_size):
 
 # Test
 
-# data = make_dataframe()
+data = make_dataframe()
 
-# # Generar los folds
-# folds = make_folds(data)
+# Generar los folds
+folds = make_folds(data)
 
-# # Crear subdataframes 
-# subdataframes = make_subdataframes(data, folds)
+# Crear subdataframes 
+subdataframes = make_subdataframes(data, folds)
+
+print(subdataframes)
 
 # train, val, test = get_data(transform=v2.ToImage(), resize=300, normalize=False, slice=10, crop=True)
 
