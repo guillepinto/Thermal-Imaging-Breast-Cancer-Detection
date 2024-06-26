@@ -30,12 +30,17 @@ def make(config, fold=None):
     train, val, test = get_data(transform=transform, slice=1, 
                                 normalize=config.normalize, fold=fold, 
                                 resize=config.resize, crop=config.crop)
+    
+    input_size = train[0][0].size()
+
     train_loader = make_loader(train, batch_size=config.batch_size)
     val_loader = make_loader(val, batch_size=config.batch_size)
     test_loader = make_loader(test, batch_size=config.batch_size)
 
     # Make the model
-    model = make_model(config.architecture).to(DEVICE)
+    model = make_model(config.architecture, input_size).to(DEVICE)
+
+    del input_size
 
     # Make the loss 
     criterion = nn.BCEWithLogitsLoss()
@@ -87,11 +92,11 @@ def build_optimizer(network, optimizer, learning_rate):
                               lr=learning_rate)
   return optimizer
 
-def make_model(architecture:str):
+def make_model(architecture:str, input_size:list=[1, 480, 640]):
   if architecture=='xception':
       model = xception(n_channels=1, n_classes=1)
   elif architecture=='vgg':
-      model = vgg(num_classes=1, input_size=[1, 480, 640])
+      model = vgg(num_classes=1, input_size=input_size)
   return model
 
 def visualize_batch_inference(images, ground_truths, predictions):
