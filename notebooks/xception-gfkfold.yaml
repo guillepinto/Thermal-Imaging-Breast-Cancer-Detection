@@ -1,0 +1,40 @@
+# method can be grid, random or bayes
+method: grid
+
+# metric to optimize, it doesn't really matter if we use grid
+metric:
+  goal: maximize
+  name: test_recall
+
+# the best hyperparameters found
+parameters:
+  architecture:
+    values:
+      - xception
+  # I want to test these parameters with and without augmentation
+  augmented:
+    values:
+      - true
+      - false
+  batch_size:
+    values:
+      - 16
+  crop:
+    values:
+      - false
+  learning_rate:
+    values: 
+      - 0.005042
+  normalize:
+    values:
+      - false
+  optimizer:
+    values:
+      - sgd
+  resize:
+    values:
+      - 50
+
+# the program to run
+program: train_gkfold.py
+project: dip-project
