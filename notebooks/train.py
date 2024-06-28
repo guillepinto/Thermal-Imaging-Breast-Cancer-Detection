@@ -78,7 +78,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, accuracy_fn, ep
     # Initialize the step counter 
     step = 0
     best_val_loss = float('inf')
-    patience = 5
+    patience = 10
 
     # 4 means that I am going to make 4 logs of the metrics when training
     n_prints = int(len(train_loader)/4)
@@ -107,7 +107,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, accuracy_fn, ep
       # Early stopping    
       if val_loss < best_val_loss:
         best_val_loss = val_loss
-        patience = 5  # Reset patience counter
+        patience = 10  # Reset patience counter
       else:
         patience -= 1
         if patience == 0:
