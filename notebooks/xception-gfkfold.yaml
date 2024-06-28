@@ -1,20 +1,13 @@
 # method can be grid, random or bayes
 method: grid
 
-# metric to optimize, it doesn't really matter if we use grid
-metric:
-  goal: maximize
-  name: test_recall
-
 # the best hyperparameters found
 parameters:
   architecture:
     values:
       - xception
-  # I want to test these parameters with and without augmentation
   augmented:
     values:
-      - true
       - false
   batch_size:
     values:
