@@ -21,6 +21,6 @@ def crop_breast(img):
   cropped_image = img[y:y+h, x:x+w]
 
   # Hago resize (para que todas las imagenes tengan el mismo tamaño)
-  cropped_image = cv2.resize(cropped_image, (112, 112))
+  cropped_image = cv2.resize(cropped_image, (250, 300))
 
   return cropped_image
