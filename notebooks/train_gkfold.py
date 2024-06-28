@@ -122,7 +122,6 @@ def cross_validate(config):
         avg_value = np.mean(values)
         std_value = np.std(values)
         # Average of each metric over all the folds in an experiment
-        sweep_run.log({f"{metric}_mean": avg_value, f"{metric}_std": std_value}) 
         print(f'{metric.capitalize()}:')
         print(f'  Average: {avg_value:.2f}% (+/- {std_value:.2f}%)')
         for fold, value in enumerate(values):
