@@ -106,6 +106,9 @@ def make_dataframe(train_path=TRAIN_PATH, test_path=TEST_PATH):
   return data
 
 def make_folds(data:pd.DataFrame):
+    
+    np.random.seed(2024) # seed for reproducibility
+
     # Extraer los datos para GroupKFold
     X = np.array([i for i in range(len(data))])
     y = data['label'].values
