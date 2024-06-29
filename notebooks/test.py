@@ -56,4 +56,4 @@ def test(model, test_loader, loss_fn, accuracy_fn, f1_score_fn, recall_fn, preci
     # torch.onnx.export(model, images,"model.onnx")
     # wandb.save("model.onnx")
 
-    return test_loss, test_accuracy, test_f1, test_recall, test_precision, images, outputs
+    return test_loss, test_accuracy, test_f1, test_recall, test_precision, images, outputs, labels

@@ -103,7 +103,7 @@ def train(model, train_loader, test_loader, criterion, optimizer, accuracy_fn, f
               step += 1
             
       # and validate its performance per epoch
-      test_loss, test_accuracy, test_f1, test_recall, test_precision, images, outputs = test(model, test_loader, criterion, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epoch=t)
+      test_loss, test_accuracy, test_f1, test_recall, test_precision, images, outputs, labels = test(model, test_loader, criterion, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epoch=t)
 
       # Early stopping    
       if test_loss < best_test_loss:
