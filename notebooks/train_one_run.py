@@ -9,18 +9,18 @@ from test import test
 from train import train
 
 default_config = SimpleNamespace(
-    epochs=50,
+    epochs=3,
     classes=1,
     n_channels=1,
-    batch_size=4,
-    learning_rate=0.001,
-    crop=False,
+    batch_size=8,
+    learning_rate=0.00001,
+    crop=True,
     normalize=True,
     augmented=False,
-    resize=300,
-    optimizer='sgd',
+    resize=100,
+    optimizer='adam',
     dataset="ThermalBreastCancer",
-    architecture="xception")
+    architecture="vgg")
 
 def parse_args():
     "Override default argments"
@@ -45,14 +45,14 @@ def model_pipeline(hyperparameters):
         config = wandb.config
 
         # make the model, data, loss, metrics and optimization problem
-        model, train_loader, val_loader, test_loader, criterion, optimizer, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epochs = make(config=config)
+        model, train_loader, test_loader, criterion, optimizer, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epochs = make(config=config)
         # print(model)
 
         # and use them to train the model
-        train(model, train_loader, val_loader, criterion, optimizer, accuracy_fn, epochs)
+        train(model, train_loader, test_loader, criterion, optimizer, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epochs)
             
         # get metrics of the model    
-        test(model, test_loader, accuracy_fn, f1_score_fn, recall_fn, precision_fn)
+        # test(model, test_loader, accuracy_fn, f1_score_fn, recall_fn, precision_fn)
 
     return model
 

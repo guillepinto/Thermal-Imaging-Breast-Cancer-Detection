@@ -2,7 +2,7 @@
 from PIL import Image, ImageOps
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import GroupKFold, GroupShuffleSplit
+from sklearn.model_selection import GroupKFold
 
 # Pytorch essentials for datasets.
 import torch.utils
@@ -107,7 +107,7 @@ def make_dataframe(train_path=TRAIN_PATH, test_path=TEST_PATH):
 
 def make_folds(data:pd.DataFrame):
     
-    np.random.seed(2024) # seed for reproducibility
+    # np.random.seed(2024) # seed for reproducibility
 
     # Extraer los datos para GroupKFold
     X = np.array([i for i in range(len(data))])
@@ -120,23 +120,23 @@ def make_folds(data:pd.DataFrame):
 
     # Realizar la validación cruzada por grupos
     for i, (train_index, test_index) in enumerate(gkf.split(X, y, groups), 1):
-        train_groups = groups[train_index]
+        # train_groups = groups[train_index]
 
         # Seleccionar aleatoriamente (size) pacientes del conjunto de entrenamiento para validación
-        unique_train_groups = np.unique(train_groups)
-        random_val_patients = np.random.choice(unique_train_groups, size=8, replace=False)
+        # unique_train_groups = np.unique(train_groups)
+        # random_val_patients = np.random.choice(unique_train_groups, size=8, replace=False)
         
         # Filtrar los índices de los pacientes seleccionados para validación
-        val_indices = np.isin(train_groups, random_val_patients)
+        # val_indices = np.isin(train_groups, random_val_patients)
         
         # Obtener los índices finales para entrenamiento y validación
-        final_train_index = train_index[~val_indices]
-        val_index = train_index[val_indices]
+        # final_train_index = train_index[~val_indices]
+        # val_index = train_index[val_indices]
         
         fold_name = f"fold_{i}"
         folds_dict[fold_name] = {
-            'train': final_train_index,
-            'val': val_index,
+            'train': train_index,
+            # 'val': val_index,
             'test': test_index
         }
 
@@ -148,12 +148,12 @@ def make_subdataframes(data:pd.DataFrame, folds:dict):
 
   for fold_name, indices in folds.items():
       train_df = data.iloc[indices['train']]
-      val_df = data.iloc[indices['val']]
+      # val_df = data.iloc[indices['val']]
       test_df = data.iloc[indices['test']]
       
       subdataframes[fold_name] = {
           'train': train_df,
-          'val': val_df,
+          # 'val': val_df,
           'test': test_df
       }
   
@@ -255,9 +255,9 @@ def get_data(transform, crop=None, resize=None, normalize=False, slice=1, fold:i
     train_dataset = ThermalDataset(subdataframes[fold_name]['train'],
                                     transform=transform, normalize=normalize,
                                     resize=resize, crop=crop)
-    val_dataset = ThermalDataset(subdataframes[fold_name]['val'],
-                                  transform=v2.ToImage(), normalize=normalize,
-                                  resize=resize, crop=crop)
+    # val_dataset = ThermalDataset(subdataframes[fold_name]['val'],
+    #                               transform=v2.ToImage(), normalize=normalize,
+    #                               resize=resize, crop=crop)
     test_dataset = ThermalDataset(subdataframes[fold_name]['test'],
                                     transform=v2.ToImage(), normalize=normalize,
                                     resize=resize, crop=crop)
@@ -266,12 +266,13 @@ def get_data(transform, crop=None, resize=None, normalize=False, slice=1, fold:i
     # then it returns the complete dataset
     train_dataset = torch.utils.data.Subset(train_dataset, 
                                             indices=range(0, len(train_dataset), slice))
-    val_dataset = torch.utils.data.Subset(val_dataset, 
-                                          indices=range(0, len(val_dataset), slice))
+    # val_dataset = torch.utils.data.Subset(val_dataset, 
+    #                                       indices=range(0, len(val_dataset), slice))
     test_dataset = torch.utils.data.Subset(test_dataset, 
                                             indices=range(0, len(test_dataset), slice))
 
-    return train_dataset, val_dataset, test_dataset
+    # return train_dataset, val_dataset, test_dataset
+    return train_dataset, test_dataset
 
 def make_loader(dataset, batch_size):
     loader = torch.utils.data.DataLoader(dataset=dataset,
@@ -287,6 +288,16 @@ def make_loader(dataset, batch_size):
 # # Generar los folds
 # folds = make_folds(data)
 
+# for fold_name, indices in folds.items():
+#     train_patients = data.iloc[indices['train']]['patient'].unique()
+#     # val_patients = data.iloc[indices['val']]['patient'].unique()
+#     test_patients = data.iloc[indices['test']]['patient'].unique()
+
+#     print(f"{fold_name}:\n")
+#     print(f"Train patients: {train_patients}")
+#     print(f"N patients in train: {len(train_patients)}")
+#     # print(f"Validation patients: {val_patients}")
+#     print(f"Test patients: {test_patients}\n")
 # # Crear subdataframes 
 # subdataframes = make_subdataframes(data, folds)
 

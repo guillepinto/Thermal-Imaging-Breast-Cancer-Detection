@@ -49,14 +49,14 @@ def model_pipeline(num, sweep_id, sweep_run_name, hyperparameters):
         config = wandb.config
 
         # make the model, data, and optimization problem
-        model, train_loader, val_loader, test_loader, criterion, optimizer, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epochs = make(config, num)
+        model, train_loader, test_loader, criterion, optimizer, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epochs = make(config, num)
         # print(model)
 
         # and use them to train the model
-        train(model, train_loader, val_loader, criterion, optimizer, accuracy_fn, epochs)
+        test_accuracy, test_f1, test_recall, test_precision = train(model, train_loader, test_loader, criterion, optimizer, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epochs)
             
         # get metrics of the model    
-        test_accuracy, test_f1, test_recall, test_precision = test(model, test_loader, accuracy_fn, f1_score_fn, recall_fn, precision_fn)
+        # test_accuracy, test_f1, test_recall, test_precision = test(model, test_loader, accuracy_fn, f1_score_fn, recall_fn, precision_fn)
 
     return test_accuracy, test_f1, test_recall, test_precision
 

@@ -28,14 +28,14 @@ def make(config, fold=None):
     transform = make_transforms(augmentation=config.augmented)
 
     # Make the data
-    train, val, test = get_data(transform=transform, slice=1, 
+    train, test = get_data(transform=transform, slice=12, 
                                 normalize=config.normalize, fold=fold, 
                                 resize=config.resize, crop=config.crop)
     
     input_size = train[0][0].size()
 
     train_loader = make_loader(train, batch_size=config.batch_size)
-    val_loader = make_loader(val, batch_size=config.batch_size)
+    # val_loader = make_loader(val, batch_size=config.batch_size)
     test_loader = make_loader(test, batch_size=config.batch_size)
 
     # Make the model
@@ -57,7 +57,7 @@ def make(config, fold=None):
     recall_fn = BinaryRecall().to(DEVICE)
     precision_fn = BinaryPrecision().to(DEVICE)
 
-    return model, train_loader, val_loader, test_loader, criterion, optimizer, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epochs
+    return model, train_loader, test_loader, criterion, optimizer, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epochs
 
 def make_transforms(augmentation=False):
 
