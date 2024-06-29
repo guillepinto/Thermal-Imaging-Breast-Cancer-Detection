@@ -28,7 +28,7 @@ def make(config, fold=None):
     transform = make_transforms(augmentation=config.augmented)
 
     # Make the data
-    train, test = get_data(transform=transform, slice=12, 
+    train, test = get_data(transform=transform, slice=1, 
                                 normalize=config.normalize, fold=fold, 
                                 resize=config.resize, crop=config.crop)
     
