@@ -61,9 +61,6 @@ def make(config, fold=None):
 
 def make_transforms(augmentation=False):
 
-
-  # print(f"Las imagenes son reescaladas a {HEIGHT}x{WIDTH}")
-
   # https://pytorch.org/vision/main/transforms.html#performance-considerations
   transforms_list = [
     v2.ToImage(),
@@ -73,8 +70,7 @@ def make_transforms(augmentation=False):
       # print("Efectivamente, voy a hacer transformaciones")
       transforms_list.append(v2.RandomHorizontalFlip())
       transforms_list.append(v2.RandomVerticalFlip())
-      transforms_list.append(v2.RandomRotation(degrees=45)) # Aplica una rotación aleatoria de hasta 15 grados.
-      # transforms_list.append(v2.RandomZoomOut())
+      transforms_list.append(v2.RandomRotation(degrees=45)) # Aplica una rotación aleatoria de hasta 45 grados.
       transforms_list.append(v2.RandomApply([v2.GaussianBlur(kernel_size=5)], p=0.5)) # Aplica un desenfoque gaussiano con una probabilidad de 0.5.
       transforms_list.append(v2.RandomApply([v2.RandomAffine(degrees=0, translate=(0.05, 0.05))], p=0.5)) # Aplica pequeñas traslaciones (hasta el 5% del tamaño de la imagen).
 
