@@ -11,7 +11,7 @@ from make_dataset import get_data, make_loader
 # Models
 from xception import xception
 from vgg import vgg
-# from alexnet import alexnet
+from alexnet import alexnet
 
 # Pytorch metrics
 from torchmetrics.classification import BinaryAccuracy, BinaryF1Score, BinaryRecall, BinaryPrecision
@@ -95,8 +95,8 @@ def make_model(architecture:str, input_size:list=[1, 480, 640]):
   elif architecture=='vgg':
       model = vgg(num_classes=1, input_size=input_size)
   elif architecture=='alexnet':
-    #   model = alexnet(num_classes=1, input_size=input_size)
-    pass
+      model = alexnet(num_classes=1, input_size=input_size)
+    # pass
   elif architecture=='resnet56':
       pass
   return model
