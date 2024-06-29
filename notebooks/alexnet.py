@@ -1,60 +1,29 @@
-import torch.nn as nn
+from tensorflow.keras import layers
+from tensorflow.keras.models import Model
 
-class AlexNet(nn.Module):
-    def __init__(self, num_classes=1, input_size=[1, 480, 640]):
-        super(AlexNet, self).__init__()
+def AlexNet(input_shape=(480, 640, 1), num_classes=1):
+    inp = layers.Input(shape=input_shape)
+    x = layers.Conv2D(96, kernel_size=11, strides=4, padding='same', activation='relu')(inp)
+    x = layers.BatchNormalization()(x)
+    x = layers.MaxPooling2D(pool_size=3, strides=2)(x)
 
-        self.features = nn.Sequential(
-           
-            nn.Conv2d(1, 96, kernel_size=11, stride=4, padding=2),
-            nn.ReLU(inplace=True),
-            nn.BatchNorm2d(96),
-            nn.MaxPool2d(kernel_size=3, stride=2),
+    x = layers.Conv2D(256, kernel_size=5, padding='same', activation='relu')(x)
+    x = layers.BatchNormalization()(x)
+    x = layers.MaxPooling2D(pool_size=3, strides=2)(x)
 
-            
-            nn.Conv2d(96, 256, kernel_size=5, padding=2),
-            nn.ReLU(inplace=True),
-            nn.BatchNorm2d(256),
-            nn.MaxPool2d(kernel_size=3, stride=2),
+    x = layers.Conv2D(384, kernel_size=3, padding='same', activation='relu')(x)
+    x = layers.Conv2D(384, kernel_size=3, padding='same', activation='relu')(x)
+    x = layers.Conv2D(256, kernel_size=3, padding='same', activation='relu')(x)
+    x = layers.MaxPooling2D(pool_size=3, strides=2)(x)
 
-          
-            nn.Conv2d(256, 384, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(384, 384, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(384, 256, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=3, stride=2)
-        )
+    x = layers.Flatten()(x)
+    x = layers.Dense(4096, activation='relu')(x)
+    x = layers.Dropout(0.5)(x)
+    x = layers.Dense(4096, activation='relu')(x)
+    x = layers.Dropout(0.5)(x)
+    x = layers.Dense(num_classes, activation='sigmoid')(x)
 
-        self.input_size = input_size
-        self.final_feature_size = self.calculate_final_feature_size()
-        self.classifier = nn.Sequential(
-            nn.Linear(self.final_feature_size, 4096),
-            nn.ReLU(True),
-            nn.Dropout(),
-            nn.Linear(4096, 4096),
-            nn.ReLU(True),
-            nn.Dropout(),
-            nn.Linear(4096, num_classes),
-            nn.Sigmoid()  
-        )
+    model = Model(inputs=inp, outputs=x)
 
-def calculate_final_feature_size(self):
+    return model
 
-    with torch.no_grad():
-        dummy_input = torch.zeros(1, *self.input_size)
-        dummy_output = self.features(dummy_input)
-    return dummy_output.numel()
-
-    def conv_output_size(self, size, kernel_size, stride, padding):
-        return (size - kernel_size + 2 * padding) // stride + 1
-
-    def forward(self, x):
-        x = self.features(x)
-        x = x.view(x.size(0), -1)
-        x = self.classifier(x)
-        return x
-    
-def alexnet(num_classes=1, input_size=[1, 480, 640]):
-    return AlexNet(num_classes=num_classes, input_size=input_size)
