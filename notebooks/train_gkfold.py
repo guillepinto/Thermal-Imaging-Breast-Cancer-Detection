@@ -20,7 +20,7 @@ default_config = SimpleNamespace(
     crop=False,
     normalize=False,
     augmented=False,
-    resize=150,
+    # resize=150,
     optimizer='sgd',
     dataset="ThermalBreastCancer",
     architecture="xception")
@@ -32,7 +32,7 @@ def parse_args():
     argparser.add_argument('--learning_rate', type=float, default=default_config.learning_rate, help="learning rate")
     argparser.add_argument('--optimizer', type=str, default=default_config.optimizer, help="optimizer")
     argparser.add_argument('--normalize', type=bool, default=default_config.normalize, help="normalize")
-    argparser.add_argument('--resize', type=bool, default=default_config.resize, help="resize")
+    # argparser.add_argument('--resize', type=bool, default=default_config.resize, help="resize")
     argparser.add_argument('--augmented', type=bool, default=default_config.augmented, help="augmented")
     argparser.add_argument('--architecture', type=str, default=default_config.architecture, help="architecture")
     argparser.add_argument('--crop', type=bool, default=default_config.crop, help="crop")

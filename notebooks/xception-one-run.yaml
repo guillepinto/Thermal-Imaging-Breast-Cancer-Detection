@@ -14,8 +14,6 @@ metric:
 
 # parameters space to search
 parameters:
-  resize:
-    values: [False, 100, 50]
   augmented:
     values: [True, False]
   crop:

@@ -167,11 +167,11 @@ calcular su valor máximo de temperatura y devolver el máximo de todas.
 MAX_TEMPERATURE = 36.44
 
 class ThermalDataset(Dataset):
-  def __init__(self, dataframe, transform = None, normalize = None, resize = None, crop = None):
+  def __init__(self, dataframe, transform = None, normalize:bool = None, crop:bool = None):
     self.dataframe = dataframe
     self.normalize = normalize
     self.transform = transform
-    self.resize = resize
+    # self.resize = resize
     self.crop = crop
 
   def __len__(self):
@@ -222,12 +222,10 @@ class ThermalDataset(Dataset):
       # print(type(img), img.shape)
       img = self.transform(img)
 
-    # self.resize = None if self.resize == 'None' else self.resize
-
-    if self.resize:
+    if not self.crop:
       # Todas las imagenes vienen en h: 480, w: 640 (si no se le hizo crop). El objetivo
       # es disminuir el tamaño sin perder la relación de aspecto. https://gist.github.com/tomvon/ae288482869b495201a0
-      HEIGHT = self.resize
+      HEIGHT = 250
       r = HEIGHT/img.shape[1] # Calculo la relación de aspecto.
       WIDTH = int(img.shape[2]*r)
       # print(f"Efectivamente, voy a hacer resize a {HEIGHT}x{WIDTH}")
@@ -236,7 +234,7 @@ class ThermalDataset(Dataset):
 
     return img, label
 
-def get_data(transform, crop=None, resize=None, normalize=False, slice=1, fold:int=None):
+def get_data(transform, crop:bool=None, normalize:bool=False, slice:int=1, fold:int=None):
 
     data = make_dataframe()
 
@@ -254,13 +252,13 @@ def get_data(transform, crop=None, resize=None, normalize=False, slice=1, fold:i
 
     train_dataset = ThermalDataset(subdataframes[fold_name]['train'],
                                     transform=transform, normalize=normalize,
-                                    resize=resize, crop=crop)
+                                    crop=crop)
     # val_dataset = ThermalDataset(subdataframes[fold_name]['val'],
     #                               transform=v2.ToImage(), normalize=normalize,
     #                               resize=resize, crop=crop)
     test_dataset = ThermalDataset(subdataframes[fold_name]['test'],
                                     transform=v2.ToImage(), normalize=normalize,
-                                    resize=resize, crop=crop)
+                                    crop=crop)
     
     # test with less data, it helped me to set up the experiments faster if slice=1
     # then it returns the complete dataset

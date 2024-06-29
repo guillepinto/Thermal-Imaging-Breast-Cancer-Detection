@@ -30,7 +30,7 @@ def make(config, fold=None):
     # Make the data
     train, test = get_data(transform=transform, slice=1, 
                                 normalize=config.normalize, fold=fold, 
-                                resize=config.resize, crop=config.crop)
+                                crop=config.crop)
     
     input_size = train[0][0].size()
 

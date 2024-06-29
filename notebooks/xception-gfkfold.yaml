@@ -24,9 +24,6 @@ parameters:
   optimizer:
     values:
       - sgd
-  resize:
-    values:
-      - 50
 
 # the program to run
 program: train_gkfold.py
