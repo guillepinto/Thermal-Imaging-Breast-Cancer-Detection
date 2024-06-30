@@ -5,7 +5,7 @@ class AlexNet(nn.Module):
         super(AlexNet, self).__init__()
 
         self.features = nn.Sequential(
-            nn.Conv2d(1, 96, kernel_size=11, stride=4, padding=2),
+            nn.Conv2d(1, 96, kernel_size=11, stride=4, padding=2),  # Cambio a 1 canal
             nn.ReLU(inplace=True),
             nn.BatchNorm2d(96),
             nn.MaxPool2d(kernel_size=3, stride=2),
@@ -34,7 +34,7 @@ class AlexNet(nn.Module):
             nn.ReLU(True),
             nn.Dropout(),
             nn.Linear(4096, num_classes),
-            nn.Sigmoid()
+            nn.Sigmoid()  # Cambio para salida de una neurona
         )
 
     def calculate_final_feature_size(self):
@@ -67,4 +67,3 @@ class AlexNet(nn.Module):
 
 def alexnet(num_classes=1, input_size=[1, 480, 640]):
     return AlexNet(num_classes=num_classes, input_size=input_size)
-
