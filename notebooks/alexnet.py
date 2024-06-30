@@ -1,4 +1,3 @@
-
 import torch.nn as nn
 
 class AlexNet(nn.Module):
@@ -6,18 +5,15 @@ class AlexNet(nn.Module):
         super(AlexNet, self).__init__()
 
         self.features = nn.Sequential(
-
             nn.Conv2d(1, 96, kernel_size=11, stride=4, padding=2),
             nn.ReLU(inplace=True),
             nn.BatchNorm2d(96),
             nn.MaxPool2d(kernel_size=3, stride=2),
 
-
             nn.Conv2d(96, 256, kernel_size=5, padding=2),
             nn.ReLU(inplace=True),
             nn.BatchNorm2d(256),
             nn.MaxPool2d(kernel_size=3, stride=2),
-
 
             nn.Conv2d(256, 384, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
@@ -42,19 +38,23 @@ class AlexNet(nn.Module):
         )
 
     def calculate_final_feature_size(self):
-      size_h, size_w = self.input_size[1:]
-      size_h = self.conv_output_size(size_h, 11, 4, 2) // 2
-      size_w = self.conv_output_size(size_w, 11, 4, 2) // 2
-      size_h = self.conv_output_size(size_h, 5, 1, 2) // 2
-      size_w = self.conv_output_size(size_w, 5, 1, 2) // 2
-      size_h = self.conv_output_size(size_h, 3, 1, 1)  
-      size_w = self.conv_output_size(size_w, 3, 1, 1)  
-      size_h = self.conv_output_size(size_h, 3, 1, 1)  
-      size_w = self.conv_output_size(size_w, 3, 1, 1)  
-      size_h = self.conv_output_size(size_h, 3, 1, 1) // 2
-      size_w = self.conv_output_size(size_w, 3, 1, 1) // 2
-      return size_h * size_w * 256
+        size_h, size_w = self.input_size[1:]
+        size_h = self.conv_output_size(size_h, 11, 4, 2) // 2
+        size_w = self.conv_output_size(size_w, 11, 4, 2) // 2
 
+        size_h = self.conv_output_size(size_h, 5, 1, 2) // 2
+        size_w = self.conv_output_size(size_w, 5, 1, 2) // 2
+
+        size_h = self.conv_output_size(size_h, 3, 1, 1)
+        size_w = self.conv_output_size(size_w, 3, 1, 1)
+
+        size_h = self.conv_output_size(size_h, 3, 1, 1)
+        size_w = self.conv_output_size(size_w, 3, 1, 1)
+
+        size_h = self.conv_output_size(size_h, 3, 1, 1) // 2
+        size_w = self.conv_output_size(size_w, 3, 1, 1) // 2
+
+        return size_h * size_w * 256
 
     def conv_output_size(self, size, kernel_size, stride, padding):
         return (size - kernel_size + 2 * padding) // stride + 1
@@ -67,3 +67,4 @@ class AlexNet(nn.Module):
 
 def alexnet(num_classes=1, input_size=[1, 480, 640]):
     return AlexNet(num_classes=num_classes, input_size=input_size)
+
