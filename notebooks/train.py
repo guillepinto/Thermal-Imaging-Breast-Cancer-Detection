@@ -5,8 +5,9 @@ import torch
 import wandb
 
 # Utils
-from utils import DEVICE
-from validation import validate
+from utils import DEVICE, visualize_batch_inference
+# from validation import validate
+from test import test
 
 def train_log(loss, accuracy, step, current):
     """ Log the metrics for the current batch into wandb
@@ -54,7 +55,7 @@ def train_batch(images, labels, model, optimizer, criterion, metrics_fn):
 
     return loss, accuracy
 
-def train(model, train_loader, val_loader, criterion, optimizer, accuracy_fn, epochs):
+def train(model, train_loader, test_loader, criterion, optimizer, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epochs):
     """
     Train the given model using the specified data loader, criterion, optimizer, and metric function.
 
@@ -77,8 +78,8 @@ def train(model, train_loader, val_loader, criterion, optimizer, accuracy_fn, ep
 
     # Initialize the step counter 
     step = 0
-    best_val_loss = float('inf')
-    patience = 5
+    best_test_loss = float('inf')
+    patience = 10
 
     # 4 means that I am going to make 4 logs of the metrics when training
     n_prints = int(len(train_loader)/4)
@@ -102,13 +103,19 @@ def train(model, train_loader, val_loader, criterion, optimizer, accuracy_fn, ep
               step += 1
             
       # and validate its performance per epoch
-      val_loss = validate(model, val_loader, criterion, accuracy_fn, epoch=t)
+      test_loss, test_accuracy, test_f1, test_recall, test_precision, images, outputs, labels = test(model, test_loader, criterion, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epoch=t)
 
       # Early stopping    
-      if val_loss < best_val_loss:
-        best_val_loss = val_loss
-        patience = 5  # Reset patience counter
+      if test_loss < best_test_loss:
+        best_test_loss = test_loss
+        patience = 10  # Reset patience counter
       else:
         patience -= 1
         if patience == 0:
             break
+        
+    # Log images for inference in wandb
+    fig = visualize_batch_inference(images.cpu(), ground_truths=labels.cpu(), predictions=outputs.cpu())
+    wandb.log({"Inferences": [wandb.Image(fig, caption="Batch Inference")]})
+
+    return test_accuracy, test_f1, test_recall, test_precision

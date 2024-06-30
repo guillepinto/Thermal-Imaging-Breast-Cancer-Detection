@@ -14,12 +14,10 @@ metric:
 
 # parameters space to search
 parameters:
-  resize:
-    values: [False, 100, 50]
   augmented:
-    values: [True, False]
+    values: [True]
   crop:
-    values: [True, False]
+    values: [True]
   normalize:
     values: [True, False]
   optimizer:
@@ -34,4 +32,4 @@ parameters:
   learning_rate:
     distribution: uniform
     min: 0.0001
-    max: 0.01
+    max: 0.001

@@ -2,7 +2,7 @@
 from PIL import Image, ImageOps
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import GroupKFold, GroupShuffleSplit
+from sklearn.model_selection import GroupKFold
 
 # Pytorch essentials for datasets.
 import torch.utils
@@ -106,6 +106,9 @@ def make_dataframe(train_path=TRAIN_PATH, test_path=TEST_PATH):
   return data
 
 def make_folds(data:pd.DataFrame):
+    
+    # np.random.seed(2024) # seed for reproducibility
+
     # Extraer los datos para GroupKFold
     X = np.array([i for i in range(len(data))])
     y = data['label'].values
@@ -117,15 +120,23 @@ def make_folds(data:pd.DataFrame):
 
     # Realizar la validación cruzada por grupos
     for i, (train_index, test_index) in enumerate(gkf.split(X, y, groups), 1):
-        train_groups = groups[train_index]
+        # train_groups = groups[train_index]
 
-        gss = GroupShuffleSplit(n_splits=1, test_size=0.16, random_state=42)
-        train_idx, val_idx = next(gss.split(train_index, y[train_index], groups=train_groups))
-
+        # Seleccionar aleatoriamente (size) pacientes del conjunto de entrenamiento para validación
+        # unique_train_groups = np.unique(train_groups)
+        # random_val_patients = np.random.choice(unique_train_groups, size=8, replace=False)
+        
+        # Filtrar los índices de los pacientes seleccionados para validación
+        # val_indices = np.isin(train_groups, random_val_patients)
+        
+        # Obtener los índices finales para entrenamiento y validación
+        # final_train_index = train_index[~val_indices]
+        # val_index = train_index[val_indices]
+        
         fold_name = f"fold_{i}"
         folds_dict[fold_name] = {
-            'train': train_index[train_idx],
-            'val': train_index[val_idx],
+            'train': train_index,
+            # 'val': val_index,
             'test': test_index
         }
 
@@ -137,12 +148,12 @@ def make_subdataframes(data:pd.DataFrame, folds:dict):
 
   for fold_name, indices in folds.items():
       train_df = data.iloc[indices['train']]
-      val_df = data.iloc[indices['val']]
+      # val_df = data.iloc[indices['val']]
       test_df = data.iloc[indices['test']]
       
       subdataframes[fold_name] = {
           'train': train_df,
-          'val': val_df,
+          # 'val': val_df,
           'test': test_df
       }
   
@@ -153,14 +164,14 @@ Constante encontrada al iterar por todas las imágenes segmentadas,
 calcular su valor máximo de temperatura y devolver el máximo de todas.
 """
 
-MAX_TEMPERATURE = 36.44
+MAX_TEMPERATURE = 36.425987
 
 class ThermalDataset(Dataset):
-  def __init__(self, dataframe, transform = None, normalize = None, resize = None, crop = None):
+  def __init__(self, dataframe, transform = None, normalize:bool = None, crop:bool = None):
     self.dataframe = dataframe
     self.normalize = normalize
     self.transform = transform
-    self.resize = resize
+    # self.resize = resize
     self.crop = crop
 
   def __len__(self):
@@ -211,12 +222,10 @@ class ThermalDataset(Dataset):
       # print(type(img), img.shape)
       img = self.transform(img)
 
-    # self.resize = None if self.resize == 'None' else self.resize
-
-    if self.resize:
+    if not self.crop:
       # Todas las imagenes vienen en h: 480, w: 640 (si no se le hizo crop). El objetivo
       # es disminuir el tamaño sin perder la relación de aspecto. https://gist.github.com/tomvon/ae288482869b495201a0
-      HEIGHT = self.resize
+      HEIGHT = 250
       r = HEIGHT/img.shape[1] # Calculo la relación de aspecto.
       WIDTH = int(img.shape[2]*r)
       # print(f"Efectivamente, voy a hacer resize a {HEIGHT}x{WIDTH}")
@@ -225,7 +234,7 @@ class ThermalDataset(Dataset):
 
     return img, label
 
-def get_data(transform, crop=None, resize=None, normalize=False, slice=1, fold:int=None):
+def get_data(transform, crop:bool=None, normalize:bool=False, slice:int=1, fold:int=None):
 
     data = make_dataframe()
 
@@ -243,24 +252,25 @@ def get_data(transform, crop=None, resize=None, normalize=False, slice=1, fold:i
 
     train_dataset = ThermalDataset(subdataframes[fold_name]['train'],
                                     transform=transform, normalize=normalize,
-                                    resize=resize, crop=crop)
-    val_dataset = ThermalDataset(subdataframes[fold_name]['val'],
-                                  transform=v2.ToImage(), normalize=normalize,
-                                  resize=resize, crop=crop)
+                                    crop=crop)
+    # val_dataset = ThermalDataset(subdataframes[fold_name]['val'],
+    #                               transform=v2.ToImage(), normalize=normalize,
+    #                               resize=resize, crop=crop)
     test_dataset = ThermalDataset(subdataframes[fold_name]['test'],
                                     transform=v2.ToImage(), normalize=normalize,
-                                    resize=resize, crop=crop)
+                                    crop=crop)
     
     # test with less data, it helped me to set up the experiments faster if slice=1
     # then it returns the complete dataset
     train_dataset = torch.utils.data.Subset(train_dataset, 
                                             indices=range(0, len(train_dataset), slice))
-    val_dataset = torch.utils.data.Subset(val_dataset, 
-                                          indices=range(0, len(val_dataset), slice))
+    # val_dataset = torch.utils.data.Subset(val_dataset, 
+    #                                       indices=range(0, len(val_dataset), slice))
     test_dataset = torch.utils.data.Subset(test_dataset, 
                                             indices=range(0, len(test_dataset), slice))
 
-    return train_dataset, val_dataset, test_dataset
+    # return train_dataset, val_dataset, test_dataset
+    return train_dataset, test_dataset
 
 def make_loader(dataset, batch_size):
     loader = torch.utils.data.DataLoader(dataset=dataset,
@@ -276,8 +286,20 @@ def make_loader(dataset, batch_size):
 # # Generar los folds
 # folds = make_folds(data)
 
+# for fold_name, indices in folds.items():
+#     train_patients = data.iloc[indices['train']]['patient'].unique()
+#     # val_patients = data.iloc[indices['val']]['patient'].unique()
+#     test_patients = data.iloc[indices['test']]['patient'].unique()
+
+#     print(f"{fold_name}:\n")
+#     print(f"Train patients: {train_patients}")
+#     print(f"N patients in train: {len(train_patients)}")
+#     # print(f"Validation patients: {val_patients}")
+#     print(f"Test patients: {test_patients}\n")
 # # Crear subdataframes 
 # subdataframes = make_subdataframes(data, folds)
+
+# print(subdataframes)
 
 # train, val, test = get_data(transform=v2.ToImage(), resize=300, normalize=False, slice=10, crop=True)
 

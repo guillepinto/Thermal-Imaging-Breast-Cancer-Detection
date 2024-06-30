@@ -12,7 +12,7 @@ from test import test
 from train import train
 
 default_config = SimpleNamespace(
-    epochs=30,
+    epochs=50,
     classes=1,
     n_channels=1,
     batch_size=32,
@@ -20,7 +20,7 @@ default_config = SimpleNamespace(
     crop=False,
     normalize=False,
     augmented=False,
-    resize=150,
+    # resize=150,
     optimizer='sgd',
     dataset="ThermalBreastCancer",
     architecture="xception")
@@ -32,7 +32,7 @@ def parse_args():
     argparser.add_argument('--learning_rate', type=float, default=default_config.learning_rate, help="learning rate")
     argparser.add_argument('--optimizer', type=str, default=default_config.optimizer, help="optimizer")
     argparser.add_argument('--normalize', type=bool, default=default_config.normalize, help="normalize")
-    argparser.add_argument('--resize', type=bool, default=default_config.resize, help="resize")
+    # argparser.add_argument('--resize', type=bool, default=default_config.resize, help="resize")
     argparser.add_argument('--augmented', type=bool, default=default_config.augmented, help="augmented")
     argparser.add_argument('--architecture', type=str, default=default_config.architecture, help="architecture")
     argparser.add_argument('--crop', type=bool, default=default_config.crop, help="crop")
@@ -49,14 +49,14 @@ def model_pipeline(num, sweep_id, sweep_run_name, hyperparameters):
         config = wandb.config
 
         # make the model, data, and optimization problem
-        model, train_loader, val_loader, test_loader, criterion, optimizer, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epochs = make(config, num)
+        model, train_loader, test_loader, criterion, optimizer, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epochs = make(config, num)
         # print(model)
 
         # and use them to train the model
-        train(model, train_loader, val_loader, criterion, optimizer, accuracy_fn, epochs)
+        test_accuracy, test_f1, test_recall, test_precision = train(model, train_loader, test_loader, criterion, optimizer, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epochs)
             
         # get metrics of the model    
-        test_accuracy, test_f1, test_recall, test_precision = test(model, test_loader, accuracy_fn, f1_score_fn, recall_fn, precision_fn)
+        # test_accuracy, test_f1, test_recall, test_precision = test(model, test_loader, accuracy_fn, f1_score_fn, recall_fn, precision_fn)
 
     return test_accuracy, test_f1, test_recall, test_precision
 
@@ -122,9 +122,8 @@ def cross_validate(config):
         avg_value = np.mean(values)
         std_value = np.std(values)
         # Average of each metric over all the folds in an experiment
-        sweep_run.log({f"{metric}_mean": avg_value, f"{metric}_std": std_value}) 
         print(f'{metric.capitalize()}:')
-        print(f'  Average: {avg_value:.2f}% (+/- {std_value:.2f}%)')
+        print(f'  Average: {avg_value*100:.2f}% (+/- {std_value*100:.2f}%)')
         for fold, value in enumerate(values):
             sweep_run.log({
                 f'fold_{metric}': value,

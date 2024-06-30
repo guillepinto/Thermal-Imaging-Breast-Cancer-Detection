@@ -11,6 +11,7 @@ from make_dataset import get_data, make_loader
 # Models
 from xception import xception
 from vgg import vgg
+from alexnet import alexnet
 
 # Pytorch metrics
 from torchmetrics.classification import BinaryAccuracy, BinaryF1Score, BinaryRecall, BinaryPrecision
@@ -27,15 +28,20 @@ def make(config, fold=None):
     transform = make_transforms(augmentation=config.augmented)
 
     # Make the data
-    train, val, test = get_data(transform=transform, slice=1, 
+    train, test = get_data(transform=transform, slice=1, 
                                 normalize=config.normalize, fold=fold, 
-                                resize=config.resize, crop=config.crop)
+                                crop=config.crop)
+    
+    input_size = train[0][0].size()
+
     train_loader = make_loader(train, batch_size=config.batch_size)
-    val_loader = make_loader(val, batch_size=config.batch_size)
+    # val_loader = make_loader(val, batch_size=config.batch_size)
     test_loader = make_loader(test, batch_size=config.batch_size)
 
     # Make the model
-    model = make_model(config.architecture).to(DEVICE)
+    model = make_model(config.architecture, input_size).to(DEVICE)
+
+    del input_size
 
     # Make the loss 
     criterion = nn.BCEWithLogitsLoss()
@@ -51,27 +57,21 @@ def make(config, fold=None):
     recall_fn = BinaryRecall().to(DEVICE)
     precision_fn = BinaryPrecision().to(DEVICE)
 
-    return model, train_loader, val_loader, test_loader, criterion, optimizer, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epochs
+    return model, train_loader, test_loader, criterion, optimizer, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epochs
 
 def make_transforms(augmentation=False):
-
-
-  # print(f"Las imagenes son reescaladas a {HEIGHT}x{WIDTH}")
 
   # https://pytorch.org/vision/main/transforms.html#performance-considerations
   transforms_list = [
     v2.ToImage(),
   ]
 
-  # if rezise:
-  #   transforms_list.append(v2.Resize(size=(HEIGHT, WIDTH), antialias=True))
-
   if augmentation:
       # print("Efectivamente, voy a hacer transformaciones")
       transforms_list.append(v2.RandomHorizontalFlip())
-      transforms_list.append(v2.RandomRotation(degrees=15)) # Aplica una rotación aleatoria de hasta 15 grados.
+      transforms_list.append(v2.RandomVerticalFlip())
+      transforms_list.append(v2.RandomRotation(degrees=45)) # Aplica una rotación aleatoria de hasta 45 grados.
       transforms_list.append(v2.RandomApply([v2.GaussianBlur(kernel_size=5)], p=0.5)) # Aplica un desenfoque gaussiano con una probabilidad de 0.5.
-      transforms_list.append(v2.RandomApply([v2.ColorJitter(brightness=0.2, contrast=0.2)], p=0.5)) # Ajusta el brillo y el contraste de la imagen con una probabilidad de 0.5.
       transforms_list.append(v2.RandomApply([v2.RandomAffine(degrees=0, translate=(0.05, 0.05))], p=0.5)) # Aplica pequeñas traslaciones (hasta el 5% del tamaño de la imagen).
 
   transform = v2.Compose(transforms_list)
@@ -89,11 +89,16 @@ def build_optimizer(network, optimizer, learning_rate):
                               lr=learning_rate)
   return optimizer
 
-def make_model(architecture:str):
+def make_model(architecture:str, input_size:list=[1, 480, 640]):
   if architecture=='xception':
       model = xception(n_channels=1, n_classes=1)
   elif architecture=='vgg':
-      model = vgg(num_classes=1, input_size=[1, 480, 640])
+      model = vgg(num_classes=1, input_size=input_size)
+  elif architecture=='alexnet':
+      model = alexnet(num_classes=1, input_size=input_size)
+    # pass
+  elif architecture=='resnet56':
+      pass
   return model
 
 def visualize_batch_inference(images, ground_truths, predictions):
