@@ -164,7 +164,7 @@ Constante encontrada al iterar por todas las imágenes segmentadas,
 calcular su valor máximo de temperatura y devolver el máximo de todas.
 """
 
-MAX_TEMPERATURE = 36.44
+MAX_TEMPERATURE = 36.425987
 
 class ThermalDataset(Dataset):
   def __init__(self, dataframe, transform = None, normalize:bool = None, crop:bool = None):

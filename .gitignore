@@ -6,6 +6,7 @@ notebooks/0.03-gpr-initial-experiment.ipynb
 notebooks/0.02-gpr-experiments-base.ipynb
 reports/figures
 validation.py
+cropped_images
 
 # wandb files
 wandb
