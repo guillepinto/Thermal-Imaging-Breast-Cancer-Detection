@@ -5,7 +5,7 @@ class AlexNet(nn.Module):
         super(AlexNet, self).__init__()
 
         self.features = nn.Sequential(
-            nn.Conv2d(1, 96, kernel_size=11, stride=4, padding=2),  # Cambio a 1 canal
+            nn.Conv2d(1, 96, kernel_size=11, stride=4, padding=2),
             nn.ReLU(inplace=True),
             nn.BatchNorm2d(96),
             nn.MaxPool2d(kernel_size=3, stride=2),
@@ -34,26 +34,21 @@ class AlexNet(nn.Module):
             nn.ReLU(True),
             nn.Dropout(),
             nn.Linear(4096, num_classes),
-            nn.Sigmoid()  # Cambio para salida de una neurona
+            nn.Sigmoid()
         )
 
     def calculate_final_feature_size(self):
         size_h, size_w = self.input_size[1:]
         size_h = self.conv_output_size(size_h, 11, 4, 2) // 2
         size_w = self.conv_output_size(size_w, 11, 4, 2) // 2
-
         size_h = self.conv_output_size(size_h, 5, 1, 2) // 2
         size_w = self.conv_output_size(size_w, 5, 1, 2) // 2
-
         size_h = self.conv_output_size(size_h, 3, 1, 1)
         size_w = self.conv_output_size(size_w, 3, 1, 1)
-
         size_h = self.conv_output_size(size_h, 3, 1, 1)
         size_w = self.conv_output_size(size_w, 3, 1, 1)
-
         size_h = self.conv_output_size(size_h, 3, 1, 1) // 2
         size_w = self.conv_output_size(size_w, 3, 1, 1) // 2
-
         return size_h * size_w * 256
 
     def conv_output_size(self, size, kernel_size, stride, padding):
