@@ -87,5 +87,5 @@ class VGGNet(nn.Module):
         return x
     
 
-def vgg(num_classes=1, input_size=[1, 480, 640]):
+def vgg(num_classes=1, input_size=[1, 250, 333]):
     return VGGNet(num_classes=num_classes, input_size=input_size)
