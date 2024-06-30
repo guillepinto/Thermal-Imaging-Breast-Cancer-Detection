@@ -1,64 +1,58 @@
+import torch
 import torch.nn as nn
 
-class AlexNet(nn.Module):
-    def __init__(self, num_classes=1, input_size=[1, 480, 640]):
-        super(AlexNet, self).__init__()
+def alexnet(in_channels, num_classes):
+    class AlexNet(nn.Module):
+        def __init__(self, in_channels, num_classes):
+            super(AlexNet, self).__init__() 
+            # Convolutional layers
+            self.conv1 = nn.Conv2d(in_channels, 96, kernel_size=11, stride=4, padding=2)
+            self.conv2 = nn.Conv2d(96, 256, kernel_size=5, stride=1, padding=2)
+            self.conv3 = nn.Conv2d(256, 384, kernel_size=3, stride=1, padding=1)
+            self.conv4 = nn.Conv2d(384, 384, kernel_size=3, stride=1, padding=1)
+            self.conv5 = nn.Conv2d(384, 256, kernel_size=3, stride=1, padding=1)
 
-        self.features = nn.Sequential(
-            nn.Conv2d(1, 96, kernel_size=11, stride=4, padding=2),
-            nn.ReLU(inplace=True),
-            nn.BatchNorm2d(96),
-            nn.MaxPool2d(kernel_size=3, stride=2),
+            # Fully connected layers
+            self.fc1 = nn.Linear(256 * 6 * 6, 4069)
+            self.fc2 = nn.Linear(4069, 4069)
+            self.fc3 = nn.Linear(4069, num_classes)
 
-            nn.Conv2d(96, 256, kernel_size=5, padding=2),
-            nn.ReLU(inplace=True),
-            nn.BatchNorm2d(256),
-            nn.MaxPool2d(kernel_size=3, stride=2),
+            # Other
+            self.flatten = nn.Flatten()
+            self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2)
+            self.norm = nn.LocalResponseNorm(size=5, k=2)
+            self.droput = nn.Dropout(0.5)
+            self.relu = nn.ReLU()
 
-            nn.Conv2d(256, 384, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(384, 384, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(384, 256, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=3, stride=2)
-        )
+            # Initialize the weights
+            self._init_weights()
 
-        self.input_size = input_size
-        self.final_feature_size = self.calculate_final_feature_size()
-        self.classifier = nn.Sequential(
-            nn.Linear(self.final_feature_size, 4096),
-            nn.ReLU(True),
-            nn.Dropout(),
-            nn.Linear(4096, 4096),
-            nn.ReLU(True),
-            nn.Dropout(),
-            nn.Linear(4096, num_classes),
-            nn.Sigmoid()
-        )
+        def forward(self, x):
+            x = self.maxpool(self.norm(self.relu(self.conv1(x))))
+            x = self.maxpool(self.norm(self.relu(self.conv2(x))))
+            x = self.relu(self.conv3(x))
+            x = self.relu(self.conv4(x))
+            x = self.maxpool(self.relu(self.conv5(x))))
+            x = self.flatten(x)
+            x = self.droput(self.relu(self.fc1(x)))
+            x = self.droput(self.relu(self.fc2(x)))
+            x = self.fc3(x)
+            return x
 
-    def calculate_final_feature_size(self):
-        size_h, size_w = self.input_size[1:]
-        size_h = self.conv_output_size(size_h, 11, 4, 2) // 2
-        size_w = self.conv_output_size(size_w, 11, 4, 2) // 2
-        size_h = self.conv_output_size(size_h, 5, 1, 2) // 2
-        size_w = self.conv_output_size(size_w, 5, 1, 2) // 2
-        size_h = self.conv_output_size(size_h, 3, 1, 1)
-        size_w = self.conv_output_size(size_w, 3, 1, 1)
-        size_h = self.conv_output_size(size_h, 3, 1, 1)
-        size_w = self.conv_output_size(size_w, 3, 1, 1)
-        size_h = self.conv_output_size(size_h, 3, 1, 1) // 2
-        size_w = self.conv_output_size(size_w, 3, 1, 1) // 2
-        return size_h * size_w * 256
+        def _init_weights(self):
+            bias_1 = [1, 3, 4, 5, 6, 7] # Layers with bias initialized with 1
 
-    def conv_output_size(self, size, kernel_size, stride, padding):
-        return (size - kernel_size + 2 * padding) // stride + 1
+            for i, layer in enumerate(self.modules()):
+                if isinstance(layer, nn.Conv2d) or isinstance(layer, nn.Linear):
+                    if i in bias_1:
+                        # Initialize bias with 1
+                        nn.init.constant_(layer.bias, 1)
+                    else:
+                        # Initialize bias with 0
+                        nn.init.constant_(layer.bias, 0)
 
-    def forward(self, x):
-        x = self.features(x)
-        x = x.view(x.size(0), -1)
-        x = self.classifier(x)
-        return x
+                    # Initialize the weights from a zero-mean Gaussian 
+                    # distributition with std=0.01
+                    nn.init.normal_(layer.weight, mean=0, std=0.01)
 
-def alexnet(num_classes=1, input_size=[1, 480, 640]):
-    return AlexNet(num_classes=num_classes, input_size=input_size)
+    return AlexNet(in_channels, num_classes)
