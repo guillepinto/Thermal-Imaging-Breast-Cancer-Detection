@@ -1,7 +1,7 @@
 import torch.nn as nn
 
 class VGGNet(nn.Module):
-    def __init__(self, num_classes=1, input_size=[1, 250, 300]):
+    def __init__(self, num_classes=1, input_size=[1, 250, 333]):
         super(VGGNet, self).__init__()
 
         self.features = nn.Sequential(
