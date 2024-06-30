@@ -5,7 +5,7 @@ import wandb
 
 # Utils
 from utils import make
-from test import test
+# from test import test
 from train import train
 
 default_config = SimpleNamespace(
@@ -50,9 +50,6 @@ def model_pipeline(hyperparameters):
 
         # and use them to train the model
         train(model, train_loader, test_loader, criterion, optimizer, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epochs)
-            
-        # get metrics of the model    
-        # test(model, test_loader, accuracy_fn, f1_score_fn, recall_fn, precision_fn)
 
     return model
 

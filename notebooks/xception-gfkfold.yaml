@@ -9,12 +9,13 @@ parameters:
   augmented:
     values:
       - false
+      - true
   batch_size:
     values:
       - 16
   crop:
     values:
-      - false
+      - true
   learning_rate:
     values: 
       - 0.005042
