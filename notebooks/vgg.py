@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 class VGGNet(nn.Module):
-    def __init__(self, num_classes=1, input_size=[1, 480, 640]):
+    def __init__(self, num_classes=1, input_size=[1, 250, 300]):
         super(VGGNet, self).__init__()
 
         self.features = nn.Sequential(
@@ -50,8 +50,10 @@ class VGGNet(nn.Module):
 
         self.input_size = input_size
         self.final_feature_size = self.calculate_final_feature_size()
+        self.gap = nn.AdaptiveAvgPool2d((1, 1))
         self.classifier = nn.Sequential(
-            nn.Linear(self.final_feature_size, 4096),
+            #nn.Linear(self.final_feature_size, 4096),
+            nn.Linear(512, 4096),
             nn.ReLU(True),
             nn.Dropout(),
             nn.Linear(4096, 4096),
@@ -80,6 +82,7 @@ class VGGNet(nn.Module):
 
     def forward(self, x):
         x = self.features(x)
+        x = self.gap(x)
         x = x.view(x.size(0), -1)
         x = self.classifier(x)
         return x
