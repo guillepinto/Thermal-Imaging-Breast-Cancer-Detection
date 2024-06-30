@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 
 class AlexNet(nn.Module):
@@ -39,10 +38,21 @@ class AlexNet(nn.Module):
         )
 
     def calculate_final_feature_size(self):
-        with torch.no_grad():
-            input_tensor = torch.zeros(1, *self.input_size)
-            output_tensor = self.features(input_tensor)
-            return output_tensor.numel()
+        size_h, size_w = self.input_size[1:]
+        size_h = self.conv_output_size(size_h, 11, 4, 2) // 2
+        size_w = self.conv_output_size(size_w, 11, 4, 2) // 2
+        size_h = self.conv_output_size(size_h, 5, 1, 2) // 2
+        size_w = self.conv_output_size(size_w, 5, 1, 2) // 2
+        size_h = self.conv_output_size(size_h, 3, 1, 1)
+        size_w = self.conv_output_size(size_w, 3, 1, 1)
+        size_h = self.conv_output_size(size_h, 3, 1, 1)
+        size_w = self.conv_output_size(size_w, 3, 1, 1)
+        size_h = self.conv_output_size(size_h, 3, 1, 1) // 2
+        size_w = self.conv_output_size(size_w, 3, 1, 1) // 2
+        return size_h * size_w * 256
+
+    def conv_output_size(self, size, kernel_size, stride, padding):
+        return (size - kernel_size + 2 * padding) // stride + 1
 
     def forward(self, x):
         x = self.features(x)
