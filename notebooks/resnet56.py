@@ -56,6 +56,6 @@ class ResNet56(nn.Module):
         y = F.adaptive_avg_pool2d(y, 1)
         return self.fc(y.view(y.size(0), -1))
 
-    def resnet56(n=9,num_classes=1):
-        return ResNet56(n=n, num_classes=num_classes)      
+def resnet56(n=9,num_classes=1):
+    return ResNet56(n=n, num_classes=num_classes)      
        
