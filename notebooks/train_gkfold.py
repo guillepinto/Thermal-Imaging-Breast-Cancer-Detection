@@ -8,20 +8,22 @@ import numpy as np
 
 # Utils
 from utils import make
-from test import test
 from train import train
+
+# File management
+from datetime import datetime
 
 default_config = SimpleNamespace(
     epochs=50,
     classes=1,
     n_channels=1,
-    batch_size=32,
+    batch_size=8,
     learning_rate=0.003532,
-    crop=False,
+    crop=True,
     normalize=False,
     augmented=False,
     # resize=150,
-    optimizer='sgd',
+    optimizer='adam',
     dataset="ThermalBreastCancer",
     architecture="xception")
 
@@ -40,7 +42,7 @@ def parse_args():
     vars(default_config).update(vars(args))
     return
 
-def model_pipeline(num, sweep_id, sweep_run_name, hyperparameters):
+def model_pipeline(num, sweep_id, sweep_run_name, hyperparameters, timestamp:str):
 
     # tell wandb to get started
     run_name = f'{sweep_run_name}--{num}'
@@ -52,8 +54,11 @@ def model_pipeline(num, sweep_id, sweep_run_name, hyperparameters):
         model, train_loader, test_loader, criterion, optimizer, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epochs = make(config, num)
         # print(model)
 
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M')
+        gkfold_path = f"../models/{config.architecture}_{timestamp}"
+
         # and use them to train the model
-        test_accuracy, test_f1, test_recall, test_precision = train(model, train_loader, test_loader, criterion, optimizer, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epochs)
+        test_accuracy, test_f1, test_recall, test_precision = train(model, train_loader, test_loader, criterion, optimizer, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epochs, gkfold_path)
             
         # get metrics of the model    
         # test_accuracy, test_f1, test_recall, test_precision = test(model, test_loader, accuracy_fn, f1_score_fn, recall_fn, precision_fn)
@@ -74,7 +79,7 @@ def cross_validate(config):
 
     sweep_run = wandb.init(config=config, project="dip-project") # Inicio el sweep
     sweep_id = sweep_run.sweep_id or "unknown" # Agarro el id del sweep
-    sweep_url = sweep_run.get_sweep_url() # Agarro el url del sweep
+    # sweep_url = sweep_run.get_sweep_url() # Agarro el url del sweep
     project_url = sweep_run.get_project_url() # Agarro la url del proyecto del sweep
     sweep_group_url = f'{project_url}/groups/{sweep_id}' # Armo un string con la url del
     # proyecto y el id del sweep, para poder agrupar supongo 
@@ -97,6 +102,9 @@ def cross_validate(config):
         "test_f1_score": []
     }
 
+    # to save the model at the current time
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M')
+
     for fold in range(1, 8):
 
         reset_wandb_env() # Reinicio las variables de entorno en cada run
@@ -105,7 +113,8 @@ def cross_validate(config):
         test_accuracy, test_f1, test_recall, test_precision = model_pipeline(
             sweep_id=sweep_id, num=fold,
             sweep_run_name=sweep_run_name,
-            hyperparameters=dict(sweep_run.config)
+            hyperparameters=dict(sweep_run.config),
+            timestamp=timestamp
         )
 
         # Agrego las métricas del run actual

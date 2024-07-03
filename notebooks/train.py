@@ -1,12 +1,9 @@
-# Pytorch essentials
-import torch
-
 # wandb essentials
 import wandb
+from datetime import datetime
 
 # Utils
-from utils import DEVICE, visualize_batch_inference
-# from validation import validate
+from utils import DEVICE, visualize_batch_inference, save_model
 from test import test
 
 def train_log(loss, accuracy, step, current):
@@ -55,7 +52,7 @@ def train_batch(images, labels, model, optimizer, criterion, metrics_fn):
 
     return loss, accuracy
 
-def train(model, train_loader, test_loader, criterion, optimizer, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epochs):
+def train(model, train_loader, test_loader, criterion, optimizer, accuracy_fn, f1_score_fn, recall_fn, precision_fn, epochs:int, gkfold_path:str=None):
     """
     Train the given model using the specified data loader, criterion, optimizer, and metric function.
 
@@ -109,6 +106,13 @@ def train(model, train_loader, test_loader, criterion, optimizer, accuracy_fn, f
       if test_loss < best_test_loss:
         best_test_loss = test_loss
         patience = 10  # Reset patience counter
+
+        # Save the model status only in cross validation
+        if gkfold_path:
+          checkpoint = {'state_dict': model.state_dict(),
+                    'optimizer': optimizer.state_dict()}
+                    # 'epoch': t + 1}
+          save_model(gkfold_path, checkpoint)
       else:
         patience -= 1
         if patience == 0:
