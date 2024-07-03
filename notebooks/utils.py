@@ -5,6 +5,9 @@ from torchvision.transforms import v2
 import torch
 import torch.nn as nn
 
+# wandb essentials
+import wandb
+
 # Make datasets
 from make_dataset import get_data, make_loader
 
@@ -18,6 +21,10 @@ from torchmetrics.classification import BinaryAccuracy, BinaryF1Score, BinaryRec
 
 # Create plots
 import matplotlib.pyplot as plt
+
+# File management
+import os
+# from datetime import datetime
 
 # Device configuration
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -133,3 +140,16 @@ def visualize_batch_inference(images, ground_truths, predictions):
     # plt.show()
 
     return fig
+
+def save_model(gkfold_path:str, checkpoint:dict):
+  # Crear la carpeta models por si no existe
+  if not os.path.exists('../models'):
+    os.mkdir("../models")
+  
+  model_path = f'{gkfold_path}.pth'
+  torch.save(checkpoint, model_path)
+
+  artifact = wandb.Artifact('model', type='model')
+  artifact.add_file(model_path)
+  wandb.log_artifact(artifact)
+  
