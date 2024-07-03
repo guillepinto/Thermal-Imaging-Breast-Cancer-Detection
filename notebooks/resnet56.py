@@ -1,12 +1,15 @@
 import torch.nn as nn
 from torch.nn import functional as F
+
+conv_k_3 = lambda channel1, channel2, stride: nn.Conv2d(channel1, channel2, stride = stride, kernel_size=3, padding=1)
+
 class residual_block(nn.Module):
     
     def __init__(self, in_channel, out_channel, stride=1, change_size = True):
         super().__init__()
-        self.conv1 = self.conv_k_3(in_channel, out_channel, stride)
+        self.conv1 = conv_k_3(in_channel, out_channel, stride)
         self.bn1 = nn.BatchNorm2d(out_channel)
-        self.conv2 = self.conv_k_3(out_channel, out_channel, 1)
+        self.conv2 = conv_k_3(out_channel, out_channel, 1)
         self.bn2 = nn.BatchNorm2d(out_channel)
         #for changing activation map sizes
         self.change_size = change_size
@@ -24,13 +27,12 @@ class residual_block(nn.Module):
         y += identity
         return F.relu(y)
     
-    def conv_k_3(channel1, channel2, stride):
-        return nn.Conv2d(channel1, channel2, stride = stride, kernel_size=3, padding=1)
+    
     
 class ResNet56(nn.Module):
     def __init__(self, n=9, num_classes=1):
         super().__init__()
-        self.conv1 = self.conv_k_3(1, 16, stride = 1)
+        self.conv1 = conv_k_3(1, 16, stride = 1)
         self.bn1 = nn.BatchNorm2d(16)
         self.block1 = self.create_block(n=9, in_channel=16, 
                                         out_channel=16, stride=1, 
@@ -45,10 +47,7 @@ class ResNet56(nn.Module):
         block = [residual_block(in_channel, out_channel, stride, change_size=change_size)]
         for i in range(n-1):
             block.append(residual_block(out_channel, out_channel, stride=1, change_size=False))
-        return nn.Sequential(*block)
-
-    def conv_k_3(channel1, channel2, stride):
-        return nn.Conv2d(channel1, channel2, stride = stride, kernel_size=3, padding=1)   
+        return nn.Sequential(*block)     
         
     def forward(self, x):
         y = F.relu(self.bn1(self.conv1(x)))
@@ -57,5 +56,5 @@ class ResNet56(nn.Module):
         return self.fc(y.view(y.size(0), -1))
 
 def resnet56(n=9,num_classes=1):
-    return ResNet56(n=n, num_classes=num_classes)      
+    return ResNet56(n=n, num_classes=num_classes)    
        
