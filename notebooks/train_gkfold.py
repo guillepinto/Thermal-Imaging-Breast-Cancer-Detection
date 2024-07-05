@@ -105,7 +105,7 @@ def cross_validate(config):
     # to save the model at the current time
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
 
-    for fold in range(3, 8):
+    for fold in range(1, 8):
 
         reset_wandb_env() # Reinicio las variables de entorno en cada run
 
