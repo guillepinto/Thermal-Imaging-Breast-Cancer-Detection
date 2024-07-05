@@ -5,6 +5,8 @@
 
 Guillermo Pinto, Miguel Pimiento, Oscar Torrens, Cristian Diaz, Cristian Hernandez<br>
 
+### [Research Report](reports/)
+
 > *This project focuses on using thermal imaging as a non-invasive method for detecting breast cancer. Thermal imaging, also known as thermography, is a non-destructive, non-contact, and rapid technique that reports temperature by measuring the infrared radiation emitted by the surface of an object. This repository contains the research, implementation, and documentation of our work in this field.*
 
 </div>
