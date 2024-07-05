@@ -18,14 +18,14 @@ default_config = SimpleNamespace(
     classes=1,
     n_channels=1,
     batch_size=8,
-    learning_rate=0.003532,
+    learning_rate=0.000015528833190894192,
     crop=True,
-    normalize=False,
+    normalize=True,
     augmented=False,
     # resize=150,
     optimizer='adam',
     dataset="ThermalBreastCancer",
-    architecture="xception")
+    architecture="alexnet")
 
 def parse_args():
     "Override default argments"
@@ -105,7 +105,7 @@ def cross_validate(config):
     # to save the model at the current time
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
 
-    for fold in range(5, 8):
+    for fold in range(3, 8):
 
         reset_wandb_env() # Reinicio las variables de entorno en cada run
 

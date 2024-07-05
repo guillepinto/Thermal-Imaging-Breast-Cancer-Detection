@@ -4,6 +4,7 @@ reports/zuluaga-gomez2020.pdf
 models/*
 notebooks/0.03-gpr-initial-experiment.ipynb
 notebooks/0.02-gpr-experiments-base.ipynb
+notebooks/0.05-gpr-test-all.ipynb
 reports/figures
 validation.py
 cropped_images
