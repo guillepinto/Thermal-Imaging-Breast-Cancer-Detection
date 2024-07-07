@@ -8,23 +8,22 @@ parameters:
       - xception
   augmented:
     values:
-      - false
       - true
   batch_size:
     values:
-      - 16
+      - 64
   crop:
     values:
       - true
   learning_rate:
     values: 
-      - 0.005042
+      - 0.0006177338121893195
   normalize:
     values:
       - false
   optimizer:
     values:
-      - sgd
+      - adam
 
 # the program to run
 program: train_gkfold.py
