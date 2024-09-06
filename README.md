@@ -1,9 +1,10 @@
+**Notice:** This repository has been archived as the project has evolved into a more advanced version aimed at research publication. The current research, which includes fine-tuned models and improved results, is now available [here](https://github.com/guillepinto/Fine-Tuned-Thermal-Breast-Cancer-Diagnosis). The latest work will be presented at [U24 Fest](https://u24.uis.edu.co/), and aims for publication in peer-reviewed conference proceedings.
 <div align="center">
 
 # Thermal Imaging for Breast Cancer Detection
 
 
-Guillermo Pinto, Miguel Pimiento, Oscar Torrens, Cristian Diaz, Cristian Hernandez<br>
+Guillermo Pinto, Miguel Pimiento, Oscar Torrens, Cristian Hernandez<br>
 
 ### [Research Report](reports/Breast_Cancer_Diagnosis_Based_on_CNNs_Using_Thermal_Imaging.pdf)
 
